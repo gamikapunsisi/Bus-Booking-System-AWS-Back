@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-// Define schema for the "routes" collection
+// Define Route Schema
 const routeSchema = new mongoose.Schema({
   routeId: {
     type: String,
@@ -23,7 +23,6 @@ const routeSchema = new mongoose.Schema({
   },
 });
 
-// Create model for the "routes" collection
+// Create and export Route Model
 const Route = mongoose.model('Route', routeSchema);
-
 module.exports = Route;
