@@ -1,26 +1,41 @@
+require('dotenv').config(); // Load environment variables from .env file
+const express = require('express');
+const connectDB = require('./config/db');
+const routeRoutes = require('./routes/routeRoutes');
+const cors = require('cors');  // Add CORS middleware for cross-origin requests
+const morgan = require('morgan'); // Add morgan for HTTP request logging
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://user1:12345@cluster0.kmj6eyn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+// Connect to MongoDB
+connectDB();
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
+const app = express();
+
+// Middleware
+app.use(express.json()); // Parse JSON bodies
+app.use(cors()); // Enable CORS to allow cross-origin requests
+app.use(morgan('dev')); // Log HTTP requests in the console
+
+// Routes
+app.use('/api/routes', routeRoutes); // Specify a more descriptive path
+
+// Root Endpoint
+app.get('/', (req, res) => {
+  res.send('Welcome to the Bus Ticket Booking System API');
 });
 
-async function run() {
-  try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
-  }
-}
-run().catch(console.dir);
+// 404 Handler for non-existing routes
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
+// Global error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something went wrong!' });
+});
+
+// Start Server
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
