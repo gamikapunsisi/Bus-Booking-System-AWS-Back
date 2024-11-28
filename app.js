@@ -1,5 +1,7 @@
+// app.js
 const connectDB = require('./config/db');
 const Route = require('./models/Route');
+require('dotenv').config();
 
 // Connect to MongoDB
 connectDB();
@@ -28,7 +30,7 @@ const main = async () => {
     console.log('Updated Route:', updatedRoute);
 
     // DELETE: Delete a route
-    const deletedRoute = await Route.findOneAndDelete({ routeId: '15-3' });
+    const deletedRoute = await Route.findOneAndDelete({ routeId: '30-1' });
     console.log('Deleted Route:', deletedRoute);
   } catch (error) {
     console.error('Error performing CRUD operations:', error.message);
