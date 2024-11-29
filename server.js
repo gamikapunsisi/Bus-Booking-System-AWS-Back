@@ -8,6 +8,7 @@ const morgan = require('morgan'); // Add morgan for HTTP request logging
 // Connect to MongoDB
 connectDB();
 
+
 const app = express();
 
 // Middleware
