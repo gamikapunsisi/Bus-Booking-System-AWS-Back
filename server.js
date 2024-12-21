@@ -37,15 +37,27 @@ const Route = mongoose.model('Route', routeSchema);
 
 // Define API Routes
 // Fetch all routes from the database
+// Example backend code in Node.js using Express
+// app.get('/api/routes', async (req, res) => {
+//   try {
+//     const routes = await db.query('SELECT * FROM routes');
+//     res.json(routes);
+//   } catch (error) {
+//     console.error('Error fetching routes:', error);
+//     res.status(500).send('Error fetching routes');
+//   }
+// });
+
 app.get('/api/routes', async (req, res) => {
   try {
-    const routes = await Route.find();
-    res.json({ success: true, data: routes });
+    const routes = await Route.find(); // Use Mongoose method to fetch data from MongoDB
+    res.json(routes); // Send the routes as JSON response
   } catch (error) {
     console.error('Error fetching routes:', error);
-    res.status(500).json({ success: false, message: 'Server Error - Unable to fetch routes.' });
+    res.status(500).send('Error fetching routes');
   }
 });
+
 
 // Add a new route to the database
 app.post('/api/routes', async (req, res) => {
