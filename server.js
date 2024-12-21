@@ -1,41 +1,73 @@
-require('dotenv').config(); // Load environment variables from .env file
 const express = require('express');
-const connectDB = require('./config/db');
-const routeRoutes = require('./routes/routeRoutes');
-const cors = require('cors');  // Add CORS middleware for cross-origin requests
-const morgan = require('morgan'); // Add morgan for HTTP request logging
+const mongoose = require('mongoose');
+const cors = require('cors');
+const dotenv = require('dotenv');
 
-// Connect to MongoDB
-connectDB();
+// Load environment variables
+dotenv.config();
 
+// Create an Express app
 const app = express();
 
-// Middleware
+// Use middleware
+app.use(cors()); // Allow cross-origin requests
 app.use(express.json()); // Parse JSON bodies
-app.use(cors()); // Enable CORS to allow cross-origin requests
-app.use(morgan('dev')); // Log HTTP requests in the console
 
-// Routes
-app.use('/api/routes', routeRoutes); // Specify a more descriptive path
-
-// Root Endpoint
-app.get('/', (req, res) => {
-  res.send('Welcome to the Bus Ticket Booking System API');
+// Connect to MongoDB using the MONGO_URI environment variable
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => {
+  console.log('Connected to MongoDB');
+}).catch(err => {
+  console.error('Error connecting to MongoDB:', err.message);
 });
 
-// 404 Handler for non-existing routes
-app.use((req, res) => {
-  res.status(404).json({ message: 'Route not found' });
+// Define MongoDB schema
+const routeSchema = new mongoose.Schema({
+  routeId: { type: String, required: true },
+  routeName: { type: String, required: true },
+  distance: { type: Number, required: true },
+  estimatedTime: { type: String, required: true },
 });
 
-// Global error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
+
+// Create a model
+const Route = mongoose.model('Route', routeSchema);
+
+// Define API Routes
+// Fetch all routes from the database
+app.get('/api/routes', async (req, res) => {
+  try {
+    const routes = await Route.find();
+    res.json({ success: true, data: routes });
+  } catch (error) {
+    console.error('Error fetching routes:', error);
+    res.status(500).json({ success: false, message: 'Server Error - Unable to fetch routes.' });
+  }
 });
 
-// Start Server
-const PORT = process.env.PORT || 5001;
+// Add a new route to the database
+app.post('/api/routes', async (req, res) => {
+  const { routeId, routeName, distance, estimatedTime } = req.body;
+
+  if (!routeId || !routeName || !distance || !estimatedTime) {
+    return res.status(400).json({ success: false, message: 'Please provide all required fields.' });
+  }
+
+  try {
+    const newRoute = new Route({ routeId, routeName, distance, estimatedTime });
+    await newRoute.save();
+    res.status(201).json({ success: true, data: newRoute });
+  } catch (error) {
+    console.error('Error adding route:', error);
+    res.status(500).json({ success: false, message: 'Server Error - Unable to add route.' });
+  }
+});
+
+
+// Set up the server to listen on the configured PORT
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
