@@ -1,42 +1,33 @@
-// app.js
-const connectDB = require('./config/db');
-const Route = require('./models/Route');
+// Load environment variables from the .env file
 require('dotenv').config();
 
-// Connect to MongoDB
-connectDB();
+const express = require('express');
+const mongoose = require('mongoose');
+const busRoutes = require('./routes/busRoutes'); // Assuming your bus routes are defined in buses.js
+const routeRoutes = require('./routes/routeRoutes'); // Assuming your route routes are defined in routes.js
 
-const main = async () => {
-  try {
-    // CREATE: Add a new route
-    const newRoute = await Route.create({
-      routeId: '30-1',
-      routeName: 'Coastal Route',
-      distance: 200,
-      estimatedTime: '3.5 hours',
-    });
-    console.log('New Route Added:', newRoute);
+const app = express();
 
-    // READ: Fetch all routes
-    const routes = await Route.find();
-    console.log('All Routes:', routes);
+// Middleware to parse JSON bodies
+app.use(express.json());
 
-    // UPDATE: Update a route
-    const updatedRoute = await Route.findOneAndUpdate(
-      { routeId: '30-1' },
-      { routeName: 'Updated Coastal Route' },
-      { new: true } // Return the updated document
-    );
-    console.log('Updated Route:', updatedRoute);
+// Routes
+app.use('/api/buses', busRoutes);
+app.use('/api/routes', routeRoutes);
 
-    // DELETE: Delete a route
-    const deletedRoute = await Route.findOneAndDelete({ routeId: '30-1' });
-    console.log('Deleted Route:', deletedRoute);
-  } catch (error) {
-    console.error('Error performing CRUD operations:', error.message);
-  } finally {
-    process.exit(); // Exit the script
-  }
-};
+// Get the port from environment variables, default to 5000 if not set
+const PORT = process.env.PORT || 5000;
 
-main();
+// Connect to MongoDB using the MONGO_URI environment variable
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((error) => {
+    console.error('Error connecting to MongoDB:', error);
+  });
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
