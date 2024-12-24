@@ -14,16 +14,15 @@ app.use(cors()); // Allow cross-origin requests
 app.use(express.json()); // Parse JSON bodies
 
 // Connect to MongoDB using the MONGO_URI environment variable
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => {
-  console.log('Connected to MongoDB');
-}).catch(err => {
-  console.error('Error connecting to MongoDB:', err.message);
-});
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch(err => {
+    console.error('Error connecting to MongoDB:', err.message);
+  });
 
-// Define MongoDB schema
+// Define MongoDB schema for routes
 const routeSchema = new mongoose.Schema({
   routeId: { type: String, required: true },
   routeName: { type: String, required: true },
@@ -31,8 +30,7 @@ const routeSchema = new mongoose.Schema({
   estimatedTime: { type: String, required: true },
 });
 
-
-// Create a model
+// Create a model for Route
 const Route = mongoose.model('Route', routeSchema);
 
 // Define API Routes
@@ -65,6 +63,117 @@ app.post('/api/routes', async (req, res) => {
   }
 });
 
+// MongoDB schema for buses
+const busSchema = new mongoose.Schema({
+  busId: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true
+  },
+  busName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  busType: {
+    type: String,
+    required: true,
+    enum: ['Normal', 'Luxury', 'Express'], // Modify the options as per your use case
+  },
+  busOwner: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  busOwnerNIC: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true
+  },
+  busOwnerContact: {
+    type: String,
+    required: true,
+    match: /^[0-9]{10}$/, // Simple regex for validating a 10-digit contact number
+  },
+  busOwnerEmail: {
+    type: String,
+    required: true,
+    match: /^\S+@\S+\.\S+$/, // Simple email validation regex
+  },
+  busOwnerAddress: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  totalSeats: {
+    type: Number,
+    required: true,
+    min: 1, 
+  },
+  routeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Route', 
+    required: true
+  }
+});
+
+// Create a model for Bus
+const Bus = mongoose.model('Bus', busSchema);
+
+// API route to fetch all buses
+app.get('/api/buses', async (req, res) => { 
+  try {
+    // console.log("Fetching buses");  
+    const buses = await Bus.find();  
+    res.json({ success: true, data: buses });
+  } catch (error) {
+    console.error('Error fetching buses:', error);
+    res.status(500).json({ success: false, message: 'Server Error - Unable to fetch buses.' });
+  }
+});
+
+// API route to add a new bus
+
+
+app.post('/api/buses', async (req, res) => {
+  const { busId, busName, busType, busOwner, busOwnerNIC, busOwnerContact, busOwnerEmail, busOwnerAddress, totalSeats, routeId } = req.body;
+
+  if (!busId || !busName || !busType || !busOwner || !busOwnerNIC || !busOwnerContact || !busOwnerEmail || !busOwnerAddress || !totalSeats || !routeId) {
+    return res.status(400).json({ success: false, message: 'Please provide all required fields.' });
+  }
+
+  try {
+    // Check if routeId is a valid ObjectId (MongoDB's ObjectId)
+    let convertedRouteId;
+    if (mongoose.Types.ObjectId.isValid(routeId)) {
+      convertedRouteId = new mongoose.Types.ObjectId(routeId); // Convert routeId to ObjectId
+    } else {
+      // If routeId is not a valid ObjectId, handle it differently, e.g., store it as an integer
+      convertedRouteId = parseInt(routeId); // If it's a string representing a number, parse it as integer
+    }
+
+    const newBus = new Bus({
+      busId,
+      busName,
+      busType,
+      busOwner,
+      busOwnerNIC,
+      busOwnerContact,
+      busOwnerEmail,
+      busOwnerAddress,
+      totalSeats,
+      routeId: convertedRouteId, // Use the converted routeId
+    });
+
+    await newBus.save();
+    res.status(201).json({ success: true, data: newBus });
+  } catch (error) {
+    console.error('Error adding bus:', error);
+    res.status(500).json({ success: false, message: 'Error adding bus' });
+  }
+});
 
 // Set up the server to listen on the configured PORT
 const PORT = process.env.PORT || 5000;
