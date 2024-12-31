@@ -28,9 +28,12 @@ jobs:
 
       - name: Install dependencies
         run: |
+          # Install dependencies (npm ci if lock file exists, npm install otherwise)
           if [ -f package-lock.json ]; then
+            echo "Found package-lock.json, running npm ci."
             npm ci
           else
+            echo "No package-lock.json found, running npm install."
             npm install
           fi
 
@@ -40,3 +43,6 @@ jobs:
 
       - name: Build the project
         run: npm run build --if-present
+
+      - name: Run tests
+        run: npm test --if-present
