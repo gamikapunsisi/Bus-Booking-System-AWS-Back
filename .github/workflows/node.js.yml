@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
@@ -28,7 +28,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # Install dependencies (npm ci if lock file exists, npm install otherwise)
+          # Check if package-lock.json exists and run npm ci or npm install accordingly
           if [ -f package-lock.json ]; then
             echo "Found package-lock.json, running npm ci."
             npm ci
