@@ -1,62 +1,82 @@
 const Bus = require('../models/Bus');
+const Route = require('../models/Route');
 
 // Get all buses
 const getAllBuses = async (req, res) => {
   try {
-    const buses = await Bus.find().populate('routeId');
+    const buses = await Bus.find();
     res.status(200).json({ success: true, data: buses });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error - Unable to fetch buses.' });
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Server Error' });
   }
 };
 
 // Add a new bus
 const addBus = async (req, res) => {
   try {
-    const newBus = await Bus.create(req.body);
-    res.status(201).json({ success: true, data: newBus });
-  } catch (error) {
-    res.status(400).json({ 
-      success: false, 
-      message: error.message || 'Server Error - Unable to add bus.' 
+    const { busId, busName, busOwner, busOwnerNIC, routeId, seatPosition } = req.body;
+
+    const newBus = new Bus({
+      busId,
+      busName,
+      busOwner,
+      busOwnerNIC,
+      routeId,
+      seatPosition,
     });
+
+    await newBus.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Bus created successfully',
+      data: newBus,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Failed to create bus' });
   }
 };
 
-// Update a bus
+// Update a bus by ID
 const updateBus = async (req, res) => {
+  const { busId } = req.params;
+  const updatedData = req.body;
+
   try {
-    const updatedBus = await Bus.findOneAndUpdate(
-      { busId: req.params.busId },
-      req.body,
-      { new: true, runValidators: true }
-    );
-    if (!updatedBus) {
+    const bus = await Bus.findOneAndUpdate({ busId }, updatedData, { new: true });
+    if (!bus) {
       return res.status(404).json({ success: false, message: 'Bus not found' });
     }
-    res.json({ success: true, data: updatedBus });
+
+    res.status(200).json({ success: true, data: bus });
   } catch (error) {
-    res.status(400).json({ 
-      success: false, 
-      message: error.message || 'Server Error - Unable to update bus.' 
-    });
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Failed to update bus' });
   }
 };
 
-// Delete a bus
+// Delete a bus by ID
 const deleteBus = async (req, res) => {
+  const { busId } = req.params;
+
   try {
-    const deletedBus = await Bus.findOneAndDelete({ busId: req.params.busId });
-    if (!deletedBus) {
+    const bus = await Bus.findOneAndDelete({ busId });
+    if (!bus) {
       return res.status(404).json({ success: false, message: 'Bus not found' });
     }
-    res.json({ success: true, data: deletedBus });
+
+    res.status(200).json({ success: true, message: 'Bus deleted successfully' });
   } catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      message: error.message || 'Server Error - Unable to delete bus.' 
-    });
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Failed to delete bus' });
   }
 };
 
-module.exports = { getAllBuses, addBus, updateBus, deleteBus };
+module.exports = {
+  getAllBuses,
+  addBus,
+  updateBus,
+  deleteBus,
+};

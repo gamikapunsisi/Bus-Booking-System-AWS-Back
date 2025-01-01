@@ -3,65 +3,79 @@ const Route = require('../models/Route');
 // Get all routes
 const getAllRoutes = async (req, res) => {
   try {
-    const routes = await Route.find();
-    res.status(200).json({ success: true, data: routes });
+    const routes = await Route.find(); // Fetch all routes from the database
+    if (!routes || routes.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No routes found',
+      });
+    }
+    res.status(200).json({
+      success: true,
+      data: routes, // Send the retrieved routes in the response
+    });
   } catch (error) {
-    console.error('Error fetching routes:', error);
-    res.status(500).json({ success: false, message: 'Server Error - Unable to fetch routes.' });
+    console.error('Error fetching routes:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error - Unable to fetch routes.',
+      error: error.message,
+    });
   }
 };
 
 // Add a new route
 const addRoute = async (req, res) => {
   try {
-    console.log('Headers:', req.headers);
-    console.log('Raw Body:', req.body);
+    console.log('Received headers:', req.headers);
+    console.log('Received body:', req.body);
     
-    // Check if body is empty
+    // Validate request body
     if (!req.body || Object.keys(req.body).length === 0) {
       return res.status(400).json({
         success: false,
-        message: "Request body is empty",
+        message: 'Request body is empty.',
       });
     }
 
     const { routeId, routeName, distance, estimatedTime } = req.body;
     
-    // Create validation object
+    // Validation object to check for missing fields
     const missingFields = {
       routeId: !routeId,
       routeName: !routeName,
       distance: !distance,
-      estimatedTime: !estimatedTime
+      estimatedTime: !estimatedTime,
     };
 
-    // Check for missing fields
-    if (Object.values(missingFields).some(field => field)) {
+    // Check if any field is missing
+    if (Object.values(missingFields).includes(true)) {
       return res.status(400).json({
         success: false,
-        message: "All fields are required",
+        message: 'All fields are required.',
         missingFields,
-        receivedData: req.body
+        receivedData: req.body,
       });
     }
 
+    // Create and save the new route
     const newRoute = await Route.create({
       routeId,
       routeName,
       distance,
-      estimatedTime
+      estimatedTime,
     });
 
     res.status(201).json({
       success: true,
-      data: newRoute
+      data: newRoute, // Respond with the saved route data
     });
   } catch (error) {
-    console.error('Error adding route:', error);
+    console.error('Error adding route:', error.message);
     res.status(500).json({
       success: false,
       message: 'Server Error - Unable to add route.',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -70,17 +84,29 @@ const addRoute = async (req, res) => {
 const updateRoute = async (req, res) => {
   try {
     const updatedRoute = await Route.findOneAndUpdate(
-      { routeId: req.params.routeId },
-      req.body,
-      { new: true }
+      { routeId: req.params.routeId }, // Find route by routeId
+      req.body, // Data to update
+      { new: true } // Return the updated document
     );
+
     if (!updatedRoute) {
-      return res.status(404).json({ success: false, message: 'Route not found' });
+      return res.status(404).json({
+        success: false,
+        message: 'Route not found.',
+      });
     }
-    res.json({ success: true, data: updatedRoute });
+
+    res.status(200).json({
+      success: true,
+      data: updatedRoute, // Return the updated route
+    });
   } catch (error) {
-    console.error('Error updating route:', error);
-    res.status(500).json({ success: false, message: 'Server Error - Unable to update route.' });
+    console.error('Error updating route:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error - Unable to update route.',
+      error: error.message,
+    });
   }
 };
 
@@ -88,13 +114,26 @@ const updateRoute = async (req, res) => {
 const deleteRoute = async (req, res) => {
   try {
     const deletedRoute = await Route.findOneAndDelete({ routeId: req.params.routeId });
+
     if (!deletedRoute) {
-      return res.status(404).json({ success: false, message: 'Route not found' });
+      return res.status(404).json({
+        success: false,
+        message: 'Route not found.',
+      });
     }
-    res.json({ success: true, data: deletedRoute });
+
+    res.status(200).json({
+      success: true,
+      data: deletedRoute, // Return the deleted route data
+      message: 'Route deleted successfully.',
+    });
   } catch (error) {
-    console.error('Error deleting route:', error);
-    res.status(500).json({ success: false, message: 'Server Error - Unable to delete route.' });
+    console.error('Error deleting route:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error - Unable to delete route.',
+      error: error.message,
+    });
   }
 };
 
