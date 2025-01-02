@@ -2,7 +2,7 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// Register User
+// Register User (without generating token)
 const register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -28,18 +28,10 @@ const register = async (req, res) => {
       role: role || 'user'
     });
 
-    // Create token
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    // Send response
+    // Send response without token
     res.status(201).json({
       success: true,
       message: 'User registered successfully',
-      token,
       user: {
         id: user._id,
         name: user.name,
@@ -58,7 +50,7 @@ const register = async (req, res) => {
   }
 };
 
-// Login User
+// Login User (with token generation)
 const login = async (req, res) => {
   try {
     const { email, password, role } = req.body;
@@ -96,7 +88,7 @@ const login = async (req, res) => {
       { expiresIn: '24h' }
     );
 
-    // Send response
+    // Send response with token
     res.status(200).json({
       success: true,
       message: 'Login successful',
@@ -122,4 +114,4 @@ const login = async (req, res) => {
 module.exports = {
   register,
   login
-}; 
+};

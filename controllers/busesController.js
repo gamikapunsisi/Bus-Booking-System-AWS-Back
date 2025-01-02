@@ -1,5 +1,9 @@
 const Bus = require('../models/Bus');
 const Route = require('../models/Route');
+const { registerBusValidator } = require('../validator/busValidator');
+
+
+
 
 // Get all buses
 const getAllBuses = async (req, res) => {
@@ -15,29 +19,52 @@ const getAllBuses = async (req, res) => {
 // Add a new bus
 const addBus = async (req, res) => {
   try {
-    const { busId, busName, busOwner, busOwnerNIC, routeId, seatPosition } = req.body;
+    const {
+      busId,
+      busName,
+      busType = 'Standard', // Default value if not provided
+      busOwner,
+      busOwnerNIC,
+      busOwnerContact,
+      busOwnerEmail,
+      busOwnerAddress,
+      routeId,
+      seatPosition,
+      totalSeats,
+    } = req.body;
 
+    // Create a new Bus instance with all fields
     const newBus = new Bus({
       busId,
       busName,
+      busType,
       busOwner,
       busOwnerNIC,
+      busOwnerContact,
+      busOwnerEmail,
+      busOwnerAddress,
       routeId,
       seatPosition,
+      totalSeats,
     });
 
+    // Save the bus to the database
     await newBus.save();
 
+    // Respond with success message and the newly created bus data
     res.status(201).json({
       success: true,
       message: 'Bus created successfully',
       data: newBus,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Failed to create bus' });
+    console.error('Error creating bus:', error);
+    res.status(500).json({ success: false, message: 'Failed to create bus', error: error.message });
   }
 };
+
+module.exports = { addBus };
+
 
 // Update a bus by ID
 const updateBus = async (req, res) => {
