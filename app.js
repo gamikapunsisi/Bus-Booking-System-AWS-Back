@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const connectDB = require('./config/db'); // Import connectDB function
-require('dotenv').config(); // Load environment variables from .env
+const connectDB = require('./config/db');
+require('dotenv').config();
 
 // Import route handlers
 const routesRouter = require('./routes/routes');
@@ -13,12 +13,15 @@ const authRouter = require('./routes/auth');
 const app = express();
 
 // Middleware: CORS configuration
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:3000', // Frontend URL from .env or default
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin:'http://localhost:3000', // Allow frontend to access (React on port 3000)
+  credentials: true, // Allow cookies and authorization headers
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'], // Allow OPTIONS method for preflight
+  allowedHeaders: ['Content-Type', 'Authorization'], // Accept Content-Type and Authorization headers
+};
+
+// Apply the CORS middleware globally
+app.use(cors(corsOptions));
 
 // Middleware: JSON and URL-encoded data parsing
 app.use(express.json());
