@@ -2,7 +2,7 @@ require('dotenv').config();
 const mongoose = require('mongoose'); // Import mongoose
 const app = require('./app');
 
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI; // Get MongoDB URI from environment variables
 
 // Verify MongoDB URI is loaded

@@ -1,36 +1,16 @@
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-
-// Load environment variables//////
-dotenv.config();
+require('dotenv').config();
 
 const connectDB = async () => {
   try {
-    if (!process.env.MONGO_URI) {
-      throw new Error('MongoDB URI is not defined in environment variables');
-    }
-
-    // Add these options to handle deprecation warnings
-    const options = {
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
-    };
-
-    await mongoose.connect(process.env.MONGO_URI, options);
-    console.log(`MongoDB Connected: ${mongoose.connection.host}`);
-
-    // Set up connection error handlers
-    mongoose.connection.on('error', (err) => {
-      console.error('MongoDB connection error:', err);
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
     });
-
-    mongoose.connection.on('disconnected', () => {
-      console.log('MongoDB disconnected');
-    });
-
-  } catch (error) {
-    console.error('MongoDB connection failed:', error.message);
-    throw error; // Propagate error to caller
+    console.log('✅ MongoDB connected successfully');
+  } catch (err) {
+    console.error('❌ MongoDB connection error:', err.message);
+    throw err; // Re-throw to handle in app.js
   }
 };
 

@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const mongoose = require('mongoose');
+const connectDB = require('./config/db'); // Import connectDB function
 require('dotenv').config(); // Load environment variables from .env
 
 // Import route handlers
@@ -12,36 +12,36 @@ const authRouter = require('./routes/auth');
 // Initialize Express app
 const app = express();
 
-// CORS configuration
+// Middleware: CORS configuration
 app.use(
   cors({
-    origin: 'http://localhost:3000', // Your frontend URL
+    origin: process.env.CLIENT_URL || 'http://localhost:3000', // Frontend URL from .env or default
     credentials: true,
   })
 );
 
-// Middleware for parsing JSON and URL-encoded data
+// Middleware: JSON and URL-encoded data parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Debug middleware to log requests
+// Middleware: Debug logging for incoming requests
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   next();
 });
 
-// Health check endpoint
+// Route: Health check
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// API routes
+// Routes: API endpoints
 app.use('/api/routes', routesRouter);
 app.use('/api/buses', busesRouter);
 app.use('/api/schedules', schedulesRouter);
 app.use('/api/auth', authRouter);
 
-// Error handling middleware
+// Middleware: Error handling
 app.use((err, req, res, next) => {
   console.error(`Error: ${err.message}`);
   res.status(err.status || 500).json({
@@ -50,29 +50,17 @@ app.use((err, req, res, next) => {
   });
 });
 
-// MongoDB connection setup
-// MongoDB connection setup
-const connectDB = async () => {
-  try {
-    const uri = process.env.MONGO_URI; // Only use the environment variable
-    if (!uri) {
-      throw new Error('MONGO_URI environment variable is not defined');
-    }
-    await mongoose.connect(uri); // Attempt to connect using the provided URI
-    console.log('MongoDB connected successfully.');
-  } catch (error) {
-    console.error('Failed to connect to MongoDB:', error.message);
-    process.exit(1); // Exit process with failure
-  }
-};
-
-
-// Start the server
+// Start server after connecting to the database
 const PORT = process.env.PORT || 5001;
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error('❌ Failed to connect to the database:', error.message);
+    process.exit(1); // Exit process with failure
   });
-});
 
 module.exports = app;
