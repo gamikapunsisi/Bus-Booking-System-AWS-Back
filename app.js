@@ -8,6 +8,7 @@ const routesRouter = require('./routes/routes');
 const busesRouter = require('./routes/buses');
 const schedulesRouter = require('./routes/schedules');
 const authRouter = require('./routes/auth');
+// const tripRoutes = require('./routes/tripRoutes.js');
 
 // Initialize Express app
 const app = express();
@@ -43,6 +44,7 @@ app.use('/api/routes', routesRouter);
 app.use('/api/buses', busesRouter);
 app.use('/api/schedules', schedulesRouter);
 app.use('/api/auth', authRouter);
+// app.use('/api/trips', tripRoutes);
 
 // Middleware: Error handling
 app.use((err, req, res, next) => {

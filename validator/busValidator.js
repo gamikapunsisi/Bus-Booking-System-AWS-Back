@@ -1,84 +1,54 @@
-const { check, validationResult } = require('express-validator');
-
-const busValidationRules = [
-  check('busId').notEmpty().withMessage('Bus ID is required'),
-  check('busName').notEmpty().withMessage('Bus Name is required'),
-  check('busType').notEmpty().withMessage('Bus Type is required'),
-  check('busOwner').notEmpty().withMessage('Bus Owner is required'),
-  check('busOwnerContact')
-    .notEmpty()
-    .withMessage('Bus Owner Contact is required')
-    .isMobilePhone()
-    .withMessage('Invalid contact number'),
-  check('busOwnerEmail')
-    .notEmpty()
-    .withMessage('Bus Owner Email is required')
-    .isEmail()
-    .withMessage('Invalid email address'),
-  check('busOwnerAddress').notEmpty().withMessage('Bus Owner Address is required'),
-  check('busOwnerNIC').notEmpty().withMessage('Bus Owner NIC is required'),
-  check('totalSeats')
-    .notEmpty()
-    .withMessage('Total Seats is required')
-    .isInt({ min: 1 })
-    .withMessage('Total Seats must be a positive integer')
-    .custom((value, { req }) => {
-      const { leftPosition, rightPosition, backPosition } = req.body.seatPosition;
-      
-      // Ensure the seat positions exist before calculating
-      if (!leftPosition || !rightPosition || !backPosition) {
-        throw new Error('Invalid seat position data');
-      }
-
-      const totalCalculatedSeats =
-        leftPosition.numberOfRows * leftPosition.numberOfSeatsPerRow +
-        rightPosition.numberOfRows * rightPosition.numberOfSeatsPerRow +
-        backPosition.numberOfRows * backPosition.numberOfSeatsPerRow;
-
-      if (value !== totalCalculatedSeats) {
-        throw new Error('Total Seats mismatch with seat position');
-      }
-      return true;
-    }),
-  check('routeId').notEmpty().withMessage('Route ID is required'),
-  check('seatPosition.leftPosition.numberOfSeatsPerRow')
-    .notEmpty()
-    .withMessage('Number of seats per row in left position is required')
-    .isInt({ min: 1 })
-    .withMessage('Number of seats per row must be a positive integer'),
-  check('seatPosition.leftPosition.numberOfRows')
-    .notEmpty()
-    .withMessage('Number of rows in left position is required')
-    .isInt({ min: 1 })
-    .withMessage('Number of rows must be a positive integer'),
-  check('seatPosition.rightPosition.numberOfSeatsPerRow')
-    .notEmpty()
-    .withMessage('Number of seats per row in right position is required')
-    .isInt({ min: 1 })
-    .withMessage('Number of seats per row must be a positive integer'),
-  check('seatPosition.rightPosition.numberOfRows')
-    .notEmpty()
-    .withMessage('Number of rows in right position is required')
-    .isInt({ min: 1 })
-    .withMessage('Number of rows must be a positive integer'),
-  check('seatPosition.backPosition.numberOfSeatsPerRow')
-    .notEmpty()
-    .withMessage('Number of seats per row in back position is required')
-    .isInt({ min: 1 })
-    .withMessage('Number of seats per row must be a positive integer'),
-  check('seatPosition.backPosition.numberOfRows')
-    .notEmpty()
-    .withMessage('Number of rows in back position is required')
-    .isInt({ min: 1 })
-    .withMessage('Number of rows must be a positive integer')
-];
-
-const validate = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ success: false, errors: errors.array() });
-  }
-  next();
+const errorHandler = (statusCode, message) => {
+  return { statusCode, message };
 };
 
-module.exports = { busValidationRules, validate };
+const registerBusValidator = (body) => {
+  const {
+    busId,
+    busName,
+    busType,
+    busOwner,
+    busOwnerContact,
+    busOwnerEmail,
+    busOwnerAddress,
+    busOwnerNIC,
+    totalSeats,
+    routeId,
+    seatPosition,
+  } = body;
+
+  const { leftPosition, rightPosition, backPosition } = seatPosition;
+
+  if (busId === undefined || busId === "") {
+    return errorHandler(400, "Bus ID is required");
+  } else if (busName === undefined || busName === "") {
+    return errorHandler(400, "Bus Name is required");
+  } else if (busType === undefined || busType === "") {
+    return errorHandler(400, "Bus Type is required");
+  } else if (busOwner === undefined || busOwner === "") {
+    return errorHandler(400, "Bus Owner is required");
+  } else if (busOwnerContact === undefined || busOwnerContact === "") {
+    return errorHandler(400, "Bus Owner Contact is required");
+  } else if (busOwnerEmail === undefined || busOwnerEmail === "") {
+    return errorHandler(400, "Bus Owner Email is required");
+  } else if (busOwnerAddress === undefined || busOwnerAddress === "") {
+    return errorHandler(400, "Bus Owner Address is required");
+  } else if (busOwnerNIC === undefined || busOwnerNIC === "") {
+    return errorHandler(400, "Bus Owner NIC is required");
+  } else if (totalSeats === undefined || totalSeats === "") {
+    return errorHandler(400, "Total Seats is required");
+  } else if (routeId === undefined || routeId === "") {
+    return errorHandler(400, "Route ID is required");
+  } else if (
+    totalSeats !==
+    leftPosition.numberOfRows * leftPosition.numberOfSeatsPerRow +
+      rightPosition.numberOfRows * rightPosition.numberOfSeatsPerRow +
+      backPosition.numberOfRows * backPosition.numberOfSeatsPerRow
+  ) {
+    return errorHandler(400, "Total Seats mismatch with seat position");
+  } else {
+    return true;
+  }
+};
+
+module.exports = { registerBusValidator };

@@ -2,9 +2,6 @@ const Bus = require('../models/Bus');
 const Route = require('../models/Route');
 const { registerBusValidator } = require('../validator/busValidator');
 
-
-
-
 // Get all buses
 const getAllBuses = async (req, res) => {
   try {
