@@ -11,7 +11,6 @@ router.get('/', getAllBuses);
 
 // Add a new bus
 router.post('/', busValidationRules, validate, addBus);
-
 // Update a bus by ID
 router.put('/:busId', updateBus);
 
