@@ -47,7 +47,7 @@ jobs:
       - name: Start Node.js Server using PM2
         run: |
           pm2 stop all || true  # Stop any existing instances
-          pm2 start index.js  # Start your app, change 'app.js' to your entry point
-
+          pm2 start server.js  
+          
       - name: Check website status
         run: curl -I ${{ secrets.url }}
