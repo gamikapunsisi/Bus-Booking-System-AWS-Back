@@ -1,26 +1,53 @@
-name: Node.js CI/CD
+name: Deploy Node Backend with Database Variables
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
-  build:
-    runs-on: self-hosted
-    strategy:
-      matrix:
-        node-version: [22.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+  FTP-Deploy-Action:
+    name: Deploy to cPanel
+    runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: |
-        touch .env
-        echo "${{ secrets.MONGO_DB_URL }}" > .env
-    - run: npm run build --if-present
-   
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: npm install
+
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
+          CI: false
+
+      - name: Sync folders and files to the server
+        uses: SamKirkland/FTP-Deploy-Action@4.3.3
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./
+
+      - name: Install pm2 globally
+        run: npm install pm2 -g
+
+      - name: Start Node.js Server using PM2
+        run: |
+          pm2 stop all || true  # Stop any existing instances
+          pm2 start index.js  # Start your app, change 'app.js' to your entry point
+
+      - name: Check website status
+        run: curl -I ${{ secrets.url }}
