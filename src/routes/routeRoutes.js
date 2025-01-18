@@ -123,3 +123,14 @@
  *       404:
  *         description: Route not found
  */ 
+
+const express = require('express');
+const router = express.Router();
+const { addRoute } = require('../controllers/busRouteController');
+
+// Add this route
+router.post('/api/bus/routes', addRoute);
+
+// ... other routes ...
+
+module.exports = router; 

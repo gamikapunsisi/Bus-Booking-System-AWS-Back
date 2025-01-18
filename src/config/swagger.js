@@ -4,7 +4,7 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Bus Booking API',
+      title: 'E-BusReserv Booking API',
       version: '1.0.0',
       description: 'API documentation for the Bus Booking System ',
     },

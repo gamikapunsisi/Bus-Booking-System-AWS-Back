@@ -1,3 +1,4 @@
+const { Schema } = require('@mui/icons-material');
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
@@ -16,10 +17,26 @@ const userSchema = new mongoose.Schema({
 
 const tripSchema = new mongoose.Schema({
     tripId: { type: String, required: true, unique: true },
-    busRoute: { type: String, required: true },
+    busRoute: { 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'BusRoute',
+        required: true 
+    },
     driverName: { type: String, required: true },
     conductorName: { type: String, required: true },
-    tripDate: { type: Date, required: true }
+    tripDate: { type: Date, required: true },
+    departureTime: {
+        type: String,
+        required: false,
+      },
+      arrivalTime: {
+        type: String,
+        required: true,
+      },
+      busId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Bus',
+      }
 }, { timestamps: true });
 
 const seatBookingSchema = new mongoose.Schema({
@@ -46,10 +63,60 @@ const refreshTokenSchema = new mongoose.Schema({
     token: { type: String, required: true, unique: true }
 }, { timestamps: true });
 
+
+
+const BusSchema = new Schema(
+    {
+      busId: {
+        type: String,
+        required: true,
+        unique: true,
+      },
+      busName: {
+        type: String,
+        required: true,
+      },
+      busType: {
+        type: String,
+        required: true,
+      },
+      totalSeats: {
+        type: Number,
+        required: true,
+      },
+      seatPosition: {
+        leftPosition: {
+          numberOfSeatsPerRow: Number,
+          numberOfRows: Number,
+        },
+        rightPosition: {
+          numberOfSeatsPerRow: Number,
+          numberOfRows: Number,
+        },
+        backPosition: {
+          numberOfSeatsPerRow: Number,
+          numberOfRows: Number,
+        },
+      },
+      seatLayout: [
+        {
+          seatNumber: String,
+          isBooked: { type: Boolean, default: false },
+        },
+      ],
+      routeId: { type: Schema.Types.ObjectId, ref: "BusRoute" },
+      userId: { type: Schema.Types.ObjectId, ref: "User" },
+    },
+    {
+      timestamps: true,
+    }
+  );
+
 module.exports = {
     User: mongoose.model('User', userSchema),
     Trip: mongoose.model('Trip', tripSchema),
     SeatBooking: mongoose.model('SeatBooking', seatBookingSchema),
     BusRoute: mongoose.model('BusRoute', busRouteSchema),
-    RefreshToken: mongoose.model('RefreshToken', refreshTokenSchema)
+    RefreshToken: mongoose.model('RefreshToken', refreshTokenSchema),
+    Bus: mongoose.model('Bus', BusSchema)
 }; 

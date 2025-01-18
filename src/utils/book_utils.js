@@ -2,7 +2,7 @@ const { v4: uuidv4 } = require('uuid');
 const { Trip, SeatBooking } = require('../models/schemas');
 const routeUtils = require('./route_utils');
 
-const createTrip = async (bus_route, driver_name, conductor_name, trip_date) => {
+const createTrip = async (bus_route, driver_name, conductor_name, trip_date, departureTime, arrivalTime) => {
     const trip_id = uuidv4();
     
     const trip = await Trip.create({
@@ -10,6 +10,8 @@ const createTrip = async (bus_route, driver_name, conductor_name, trip_date) => 
         busRoute: bus_route,
         driverName: driver_name,
         conductorName: conductor_name,
+        departureTime: departureTime,
+        arrivalTime: arrivalTime,
         tripDate: trip_date
     });
     
