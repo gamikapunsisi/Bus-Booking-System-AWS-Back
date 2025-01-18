@@ -138,8 +138,8 @@ const busBookController = require('../controllers/busBookController');
 
 router.post('/book', authenticateToken, busBookController.bookSeatsController);
 router.get('/seats/:tripId', authenticateToken, busBookController.getBookedSeatsController);
-router.post('/trip', authenticateToken, busBookController.getTripController);
-router.post('/trip/create', authenticateToken, busBookController.createTripController);
+router.get('/schedule', authenticateToken, busBookController.getTripController);
+router.post('/schedule', authenticateToken, busBookController.createTripController);
 
 /**
  * @swagger

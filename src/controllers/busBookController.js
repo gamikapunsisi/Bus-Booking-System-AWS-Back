@@ -21,10 +21,10 @@ const getTripController = async (req, res) => {
 
 const createTripController = async (req, res) => {
     try {
-        const { bus_route, driver_name, conductor_name, trip_date } = req.body;
+        const { bus_route, driver_name, conductor_name, trip_date, departureTime, arrivalTime } = req.body;
         
         const tripDate = new Date(trip_date);
-        const trip_id = await createTrip(bus_route, driver_name, conductor_name, tripDate);
+        const trip_id = await createTrip(bus_route, driver_name, conductor_name, tripDate, departureTime, arrivalTime );
         
         res.status(201).json({
             success: true,
