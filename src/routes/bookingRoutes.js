@@ -1,7 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/authMiddleware');
-const busBookController = require('../controllers/busBookController');
+const {
+    createBooking,
+    getBookingsByTripId,
+    getBookingById,
+    getBookingsByUserId,
+} = require('../controllers/bookingController');
 
 /**
  * @swagger
@@ -136,10 +141,18 @@ const busBookController = require('../controllers/busBookController');
  *         description: No bookings found for user
  */
 
+<<<<<<< HEAD
+router.post('/', authenticateToken, createBooking);
+router.get('/trip/:tripId', authenticateToken, getBookingsByTripId);
+router.get('/:bookingId', authenticateToken, getBookingById);
+router.get('/user/:userId', authenticateToken, getBookingsByUserId);
+
+=======
 router.post('/book', authenticateToken, busBookController.bookSeatsController);
 router.get('/seats/:tripId', authenticateToken, busBookController.getBookedSeatsController);
-router.post('/trip', authenticateToken, busBookController.getTripController);
-router.post('/trip/create', authenticateToken, busBookController.createTripController);
+router.get('/schedule', authenticateToken, busBookController.getTripController);
+router.post('/schedule', authenticateToken, busBookController.createTripController);
+>>>>>>> b241278350e608e17436d2dbe428ff1b8c845a16
 
 /**
  * @swagger
