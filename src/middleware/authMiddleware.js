@@ -18,7 +18,7 @@ const authenticateToken = async (req, res, next) => {
         }
 
         req.user = {
-            userId: user.userId,
+            userId: user._id,
             userType: user.userType
         };
         next();
