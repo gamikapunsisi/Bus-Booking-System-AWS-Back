@@ -124,52 +124,7 @@ const refreshTokenSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const BusSchema = new mongoose.Schema(
-  {
-    busId: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    busName: {
-      type: String,
-      required: true,
-    },
-    busType: {
-      type: String,
-      required: true,
-    },
-    totalSeats: {
-      type: Number,
-      required: true,
-    },
-    seatPosition: {
-      leftPosition: {
-        numberOfSeatsPerRow: Number,
-        numberOfRows: Number,
-      },
-      rightPosition: {
-        numberOfSeatsPerRow: Number,
-        numberOfRows: Number,
-      },
-      backPosition: {
-        numberOfSeatsPerRow: Number,
-        numberOfRows: Number,
-      },
-    },
-    seatLayout: [
-      {
-        seatNumber: String,
-        isBooked: { type: Boolean, default: false },
-      },
-    ],
-    routeId: { type: Schema.Types.ObjectId, ref: "BusRoute" },
-    userId: { type: Schema.Types.ObjectId, ref: "User" },
-  },
-  {
-    timestamps: true,
-  }
-);
+
 
 
 
@@ -221,15 +176,6 @@ const BusSchema = new Schema(
   );
 
 module.exports = {
-<<<<<<< HEAD
-  User: mongoose.model("User", userSchema),
-  Trip: mongoose.model("Trip", tripSchema),
-  Booking: mongoose.model("Booking", BookingSchema),
-  BusRoute: mongoose.model("BusRoute", busRouteSchema),
-  RefreshToken: mongoose.model("RefreshToken", refreshTokenSchema),
-  Bus: mongoose.model("Bus", BusSchema),
-};
-=======
     User: mongoose.model('User', userSchema),
     Trip: mongoose.model('Trip', tripSchema),
     SeatBooking: mongoose.model('SeatBooking', seatBookingSchema),
@@ -237,4 +183,3 @@ module.exports = {
     RefreshToken: mongoose.model('RefreshToken', refreshTokenSchema),
     Bus: mongoose.model('Bus', BusSchema)
 }; 
->>>>>>> b241278350e608e17436d2dbe428ff1b8c845a16
