@@ -141,18 +141,16 @@ const {
  *         description: No bookings found for user
  */
 
-<<<<<<< HEAD
+
 router.post('/', authenticateToken, createBooking);
 router.get('/trip/:tripId', authenticateToken, getBookingsByTripId);
 router.get('/:bookingId', authenticateToken, getBookingById);
 router.get('/user/:userId', authenticateToken, getBookingsByUserId);
 
-=======
 router.post('/book', authenticateToken, busBookController.bookSeatsController);
 router.get('/seats/:tripId', authenticateToken, busBookController.getBookedSeatsController);
 router.get('/schedule', authenticateToken, busBookController.getTripController);
 router.post('/schedule', authenticateToken, busBookController.createTripController);
->>>>>>> b241278350e608e17436d2dbe428ff1b8c845a16
 
 /**
  * @swagger

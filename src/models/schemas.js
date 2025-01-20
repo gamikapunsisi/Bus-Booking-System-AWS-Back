@@ -26,6 +26,29 @@ const userSchema = new mongoose.Schema(
 const tripSchema = new mongoose.Schema(
   {
     tripId: { type: String, required: true, unique: true },
+    busRoute: { 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'BusRoute',
+        required: true 
+    },
+    driverName: { type: String, required: true },
+    conductorName: { type: String, required: true },
+    tripDate: { type: Date, required: true },
+    departureTime: {
+        type: String,
+        required: false,
+      },
+      arrivalTime: {
+        type: String,
+        required: true,
+      },
+      busId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Bus',
+      }
+}, { timestamps: true });
+
+const seatBookingSchema = new mongoose.Schema({
 
     busRoute: {
       type: mongoose.Schema.Types.ObjectId,
@@ -175,11 +198,17 @@ const BusSchema = new Schema(
     }
   );
 
+
+
+
+
 module.exports = {
     User: mongoose.model('User', userSchema),
     Trip: mongoose.model('Trip', tripSchema),
     SeatBooking: mongoose.model('SeatBooking', seatBookingSchema),
     BusRoute: mongoose.model('BusRoute', busRouteSchema),
+    RefreshToken: mongoose.model('RefreshToken', refreshTokenSchema),
+    Bus: mongoose.model('Bus', BusSchema)
     RefreshToken: mongoose.model('RefreshToken', refreshTokenSchema),
     Bus: mongoose.model('Bus', BusSchema)
 }; 

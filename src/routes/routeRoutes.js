@@ -126,20 +126,10 @@
 
 const express = require('express');
 const router = express.Router();
-
-const { addRoute, listRoutes } = require('../controllers/busRouteController');
-const { authenticateToken } = require('../middleware/authMiddleware');
-
-// Add this route
-router.post('/', authenticateToken, addRoute);
-router.get('/', authenticateToken, listRoutes)
-
-
 const { addRoute } = require('../controllers/busRouteController');
 
 // Add this route
 router.post('/api/bus/routes', addRoute);
-
 
 // ... other routes ...
 

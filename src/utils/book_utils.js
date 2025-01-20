@@ -2,25 +2,6 @@ const { v4: uuidv4 } = require("uuid");
 const { Trip, SeatBooking, Bus } = require("../models/schemas");
 const routeUtils = require("./route_utils");
 
-<<<<<<< HEAD
-const createTrip = async (
-  bus_route,
-  trip_date,
-  departureTime,
-  arrivalTime,
-  fare,
-  fromCity,
-  toCity,
-  bus_id
-) => {
-  const trip_id = uuidv4();
-
-  const bus = await Bus.findById(bus_id);
-  if (!bus) {
-    return res.json({
-      success: false,
-      message: "Bus not found",
-=======
 const createTrip = async (bus_route, driver_name, conductor_name, trip_date, departureTime, arrivalTime) => {
     const trip_id = uuidv4();
     
@@ -32,7 +13,6 @@ const createTrip = async (bus_route, driver_name, conductor_name, trip_date, dep
         departureTime: departureTime,
         arrivalTime: arrivalTime,
         tripDate: trip_date
->>>>>>> b241278350e608e17436d2dbe428ff1b8c845a16
     });
   }
 
@@ -50,7 +30,7 @@ const createTrip = async (bus_route, driver_name, conductor_name, trip_date, dep
   });
   
   return trip.tripId;
-};
+// };
 
 const bookSeats = async (trip_id, user_id, seat_ids) => {
   console.log(trip_id, user_id, seat_ids);
