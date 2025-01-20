@@ -2,8 +2,8 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const { Schema } = require('@mui/icons-material');
-const mongoose = require('mongoose');
+// const { Schema } = require('@mui/icons-material');
+// const mongoose = require('mongoose');
 
 
 const userSchema = new mongoose.Schema(
@@ -207,8 +207,6 @@ module.exports = {
     Trip: mongoose.model('Trip', tripSchema),
     SeatBooking: mongoose.model('SeatBooking', seatBookingSchema),
     BusRoute: mongoose.model('BusRoute', busRouteSchema),
-    RefreshToken: mongoose.model('RefreshToken', refreshTokenSchema),
-    Bus: mongoose.model('Bus', BusSchema)
     RefreshToken: mongoose.model('RefreshToken', refreshTokenSchema),
     Bus: mongoose.model('Bus', BusSchema)
 }; 
